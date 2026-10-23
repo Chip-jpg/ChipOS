@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ChipOS</string>
+    <string name="home_service_description">Opens ChipOS when Amazon\'s home screen appears, so the Home button leads to ChipOS. It only sees which app\'s window opened and does not read your screen.</string>
+</resources>
