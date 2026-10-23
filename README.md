@@ -12,15 +12,13 @@ Fire OS stays underneath, and everything ChipOS does is reversible.
 > the one about the Home button.
 
 <p align="center">
-  <img src="docs/screenshots/1-player.jpg" width="49%" alt="Full-size music player">
-  <img src="docs/screenshots/2-home-playing.jpg" width="49%" alt="Home screen with the now-playing card">
-</p>
-<p align="center">
-  <img src="docs/screenshots/3-settings.jpg" width="49%" alt="Settings">
+  <img src="docs/screenshots/5-home.jpg" width="49%" alt="Homepage">
   <img src="docs/screenshots/4-all-apps.jpg" width="49%" alt="All apps with search">
+
 </p>
 <p align="center">
-  <img src="docs/screenshots/5-home.jpg" width="49%" alt="Home screen">
+  <img src="docs/screenshots/2-home-playing.jpg" width="49%" alt="Home screen with the now-playing card">
+  <img src="docs/screenshots/1-player.jpg" width="49%" alt="Full-size music player">
 </p>
 
 ## Read this first: the Home button
