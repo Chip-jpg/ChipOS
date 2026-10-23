@@ -11,12 +11,14 @@ Fire OS stays underneath, and everything ChipOS does is reversible.
 > Expect rough edges. Please open issues. See [Known limitations](#known-limitations), especially
 > the one about the Home button.
 
-<!-- Add screenshots to docs/screenshots/ and uncomment:
-![Home](docs/screenshots/home.png)
-![All apps](docs/screenshots/all-apps.png)
-![Settings](docs/screenshots/settings.png)
-![Music player](docs/screenshots/player.png)
--->
+<p align="center">
+  <img src="docs/screenshots/home-playing.jpg" width="49%" alt="Home screen with the now-playing card">
+  <img src="docs/screenshots/all-apps.jpg" width="49%" alt="All apps with search">
+</p>
+<p align="center">
+  <img src="docs/screenshots/player.jpg" width="49%" alt="Full-size music player">
+  <img src="docs/screenshots/home.jpg" width="49%" alt="Home screen">
+</p>
 
 ## Read this first: the Home button
 
@@ -176,7 +178,6 @@ and Accessibility service described above.
 
 ## Roadmap
 
-- Screenshots in this README
 - Signed release builds and an in-app update check
 - Make the Home-button delay shorter if a way is found that does not need root
 
