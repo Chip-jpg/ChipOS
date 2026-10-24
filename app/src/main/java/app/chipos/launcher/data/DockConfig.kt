@@ -23,7 +23,7 @@ object DockConfig {
         DockSlot("Spotify", listOf("com.spotify.tv.android")),
         DockSlot("YouTube", listOf("com.amazon.firetv.youtube", "com.google.android.youtube.tv")),
         DockSlot("Netflix", listOf("com.netflix.ninja")),
-        DockSlot("Prime Video", listOf("com.amazon.firebat", "com.amazon.avod")),
+        DockSlot("Prime Video", listOf("com.amazon.firebat", "com.amazon.avod", "com.amazon.amazonvideo.livingroom")),
         DockSlot("ESPN", listOf("com.espn.gtv")),
     )
 }

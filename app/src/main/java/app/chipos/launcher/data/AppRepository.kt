@@ -22,6 +22,8 @@ object AppRepository {
     /** Packages that must never show up in the app list. */
     private val hiddenPackages = setOf(
         "com.amazon.tv.launcher", // Amazon's own home screen
+        "com.google.android.tvlauncher", // Android TV home screen (Sony Bravia, Google TV Streamer, ...)
+        "com.google.android.leanbacklauncher", // Older Android TV home screen
     )
 
     /** Every app that can be launched from a TV or phone launcher, sorted by name. */
