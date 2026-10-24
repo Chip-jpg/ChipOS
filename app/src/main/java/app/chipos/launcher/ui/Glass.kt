@@ -276,9 +276,9 @@ fun Modifier.glassSheen(shape: Shape, glow: () -> Float): Modifier = drawWithCac
 }
 
 /**
- * Text that looks like frosted glass: a bright solid fill with a wide, soft shadow (no dark
- * outline) so it stays readable on any wallpaper. The fill is a plain color on purpose: a gradient
- * brush combined with a shadow rendered wrongly on some TVs.
+ * Text that looks like frosted glass: a bright, plain fill with no shadow or outline. Earlier
+ * versions used a gradient brush and a drop shadow, which drew a dark border around the letters on
+ * some TVs. The wallpaper's dark scrim keeps white text readable.
  */
 @Composable
 fun GlassText(
@@ -300,11 +300,6 @@ fun GlassText(
             fontWeight = fontWeight,
             letterSpacing = letterSpacing,
             textAlign = textAlign,
-            shadow = Shadow(
-                color = Color.Black.copy(alpha = 0.30f),
-                offset = Offset(0f, 3f),
-                blurRadius = 16f,
-            ),
         )
     }
     BasicText(
