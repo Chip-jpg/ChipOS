@@ -162,20 +162,20 @@ private fun Dock(
     ) {
         val count = items.size
         // Tiles shrink on narrow screens and stop growing on wide ones.
-        val fullGap = 24.dp
-        val available = maxWidth - 30.dp * 2
-        val fullTile = ((available - fullGap * (count - 1)) / count).coerceIn(90.dp, 240.dp)
+        val fullGap = 18.dp
+        val available = maxWidth - 22.dp * 2
+        val fullTile = ((available - fullGap * (count - 1)) / count).coerceIn(90.dp, 124.dp)
 
         // These animate, so the dock shrinks and grows smoothly.
         val tileWidth by animateDpAsState(if (compact) 100.dp else fullTile, tween(300), label = "dockTile")
         val gap by animateDpAsState(if (compact) 16.dp else fullGap, tween(300), label = "dockGap")
-        val sidePadding by animateDpAsState(if (compact) 18.dp else 30.dp, tween(300), label = "dockSide")
-        val topPadding by animateDpAsState(if (compact) 18.dp else 30.dp, tween(300), label = "dockTop")
-        val bottomPadding by animateDpAsState(if (compact) 18.dp else 14.dp, tween(300), label = "dockBottom")
+        val sidePadding by animateDpAsState(if (compact) 18.dp else 22.dp, tween(300), label = "dockSide")
+        val topPadding by animateDpAsState(if (compact) 18.dp else 22.dp, tween(300), label = "dockTop")
+        val bottomPadding by animateDpAsState(if (compact) 18.dp else 12.dp, tween(300), label = "dockBottom")
 
         Row(
             modifier = Modifier
-                .liquidGlass(RoundedCornerShape(44.dp), restTop = 0.18f, restBottom = 0.06f)
+                .liquidGlass(RoundedCornerShape(36.dp), restTop = 0.18f, restBottom = 0.06f)
                 // Under each tile: the gap, the name, then the bottom padding, so the name sits
                 // centered between the tile and the bottom edge of the shelf.
                 .padding(start = sidePadding, end = sidePadding, top = topPadding, bottom = bottomPadding),

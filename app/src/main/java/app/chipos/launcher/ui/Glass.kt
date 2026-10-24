@@ -57,6 +57,12 @@ import androidx.compose.ui.unit.sp
 
 private val NoFocus: () -> Float = { 0f }
 
+/** How much of the white veil on glass surfaces is kept. Lower = more see-through. */
+private const val VEIL_SCALE = 0.55f
+
+/** How strongly the blurred wallpaper shows inside glass. Lower = more of the sharp wallpaper behind. */
+private const val BACKDROP_ALPHA = 0.60f
+
 /** Shape of the large glass sheets (All apps, Settings). */
 internal val SheetShape = ContinuousCornerShape(40.dp)
 
@@ -138,22 +144,22 @@ fun Modifier.liquidGlass(
 
             val body = Brush.verticalGradient(
                 listOf(
-                    Color.White.copy(alpha = restTop + lift),
-                    Color.White.copy(alpha = restBottom + lift),
+                    Color.White.copy(alpha = (restTop + lift) * VEIL_SCALE),
+                    Color.White.copy(alpha = (restBottom + lift) * VEIL_SCALE),
                 ),
             )
             val focusFill = Brush.verticalGradient(
                 listOf(Color.White.copy(alpha = 0.94f), Color.White.copy(alpha = 0.88f)),
             )
             val topSheen = Brush.verticalGradient(
-                0f to Color.White.copy(alpha = 0.14f),
+                0f to Color.White.copy(alpha = 0.10f),
                 0.5f to Color.Transparent,
                 startY = 0f,
                 endY = size.height,
             )
             // Small and tied to the surface's height, so wide shelves do not get a huge hazy patch.
             val glint = Brush.radialGradient(
-                colors = listOf(Color.White.copy(alpha = 0.24f), Color.Transparent),
+                colors = listOf(Color.White.copy(alpha = 0.18f), Color.Transparent),
                 center = Offset(size.width * 0.10f, 0f),
                 radius = size.minDimension * 1.4f,
             )
@@ -220,6 +226,7 @@ private fun DrawScope.drawBackdrop(origin: Offset) {
                 srcSize = IntSize(previous.width, previous.height),
                 dstOffset = IntOffset.Zero,
                 dstSize = IntSize(previous.width, previous.height),
+                alpha = BACKDROP_ALPHA,
                 filterQuality = FilterQuality.High,
             )
         }
@@ -229,7 +236,7 @@ private fun DrawScope.drawBackdrop(origin: Offset) {
             srcSize = IntSize(current.width, current.height),
             dstOffset = IntOffset.Zero,
             dstSize = IntSize(current.width, current.height),
-            alpha = if (fading) mix else 1f,
+            alpha = (if (fading) mix else 1f) * BACKDROP_ALPHA,
             filterQuality = FilterQuality.High,
         )
     }
