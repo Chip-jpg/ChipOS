@@ -32,5 +32,5 @@ rem Turns on the TV's system sounds, which ChipOS uses for its navigation clicks
 adb shell settings put system sound_effects_enabled 1
 adb shell am start -n app.chipos.launcher/.MainActivity
 echo.
-echo ChipOS installed and started. The TV's own home screen is still enabled; nothing else was changed.
+echo ChipOS installed and started. The TV's own home screen is still enabled. System sounds were turned on.
 pause
