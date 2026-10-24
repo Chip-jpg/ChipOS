@@ -9,8 +9,11 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.core.content.ContextCompat
 import app.chipos.launcher.data.ChipPrefs
 import app.chipos.launcher.data.BackState
@@ -21,6 +24,9 @@ import app.chipos.launcher.data.KeyState
 import app.chipos.launcher.data.NavSounds
 import app.chipos.launcher.data.NowPlaying
 import app.chipos.launcher.ui.ChipOsApp
+
+/** Everything in ChipOS (sizes and text) is drawn at this fraction of its normal size. */
+private const val UI_SCALE = 0.85f
 
 class MainActivity : ComponentActivity() {
 
@@ -56,11 +62,14 @@ class MainActivity : ComponentActivity() {
         ContextCompat.registerReceiver(this, packageReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
 
         setContent {
-            ChipOsApp(
-                homeSignal = homeSignal.intValue,
-                packageSignal = packageSignal.intValue,
-                resumed = resumed.value,
-            )
+            val base = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(base.density * UI_SCALE, base.fontScale)) {
+                ChipOsApp(
+                    homeSignal = homeSignal.intValue,
+                    packageSignal = packageSignal.intValue,
+                    resumed = resumed.value,
+                )
+            }
         }
     }
 

@@ -58,10 +58,10 @@ import androidx.compose.ui.unit.sp
 private val NoFocus: () -> Float = { 0f }
 
 /** How much of the white veil on glass surfaces is kept. Lower = more see-through. */
-private const val VEIL_SCALE = 0.55f
+private const val VEIL_SCALE = 0.47f
 
 /** How strongly the blurred wallpaper shows inside glass. Lower = more of the sharp wallpaper behind. */
-private const val BACKDROP_ALPHA = 0.60f
+private const val BACKDROP_ALPHA = 0.51f
 
 /** Shape of the large glass sheets (All apps, Settings). */
 internal val SheetShape = ContinuousCornerShape(40.dp)
