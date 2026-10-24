@@ -130,7 +130,7 @@ internal fun BluetoothPage() {
                     GlassRow(
                         title = "Unpair",
                         onClick = {
-                            if (!BluetoothTools.unpair(device)) toast("Couldn't unpair. Use the Fire OS Bluetooth settings.")
+                            if (!BluetoothTools.unpair(device)) toast("Couldn't unpair. Use the TV's Bluetooth settings.")
                             selected = null
                             paired = BluetoothTools.bonded(adapter)
                         },

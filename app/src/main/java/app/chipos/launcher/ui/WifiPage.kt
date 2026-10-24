@@ -226,7 +226,7 @@ internal fun WifiPage() {
                 item {
                     GlassRow(
                         title = if (scanning) "Searching..." else "No networks found",
-                        subtitle = "If this stays empty, turn Location on in Fire OS settings and scan again.",
+                        subtitle = "If this stays empty, turn Location on in the TV settings and scan again.",
                         value = "Location",
                         onClick = {
                             SystemActions.open(
@@ -252,7 +252,7 @@ internal fun WifiPage() {
                         when {
                             isCurrent -> dialog = WifiDialog.Current(currentSsid, ip)
                             network.security == WifiSecurity.Unsupported -> {
-                                toast("This network needs the Fire OS Wi-Fi settings")
+                                toast("This network needs the TV's Wi-Fi settings")
                                 SystemActions.open(context, wifiSettings)
                             }
                             network.saved || network.security == WifiSecurity.Open -> join(network, null)
@@ -269,7 +269,7 @@ internal fun WifiPage() {
         item { SectionTitle("More") }
         item {
             GlassRow(
-                title = "Fire OS Wi-Fi settings",
+                title = "TV Wi-Fi settings",
                 subtitle = "Hidden networks and company or school networks",
                 value = "›",
                 onClick = { SystemActions.open(context, wifiSettings) },

@@ -14,7 +14,7 @@ enum class WifiSecurity(val label: String) {
     Wep("Password (WEP)"),
 
     /** Company/school networks (802.1X) and WPA3-only networks: not handled here. */
-    Unsupported("Needs Fire OS settings"),
+    Unsupported("Needs TV settings"),
 }
 
 data class WifiNetwork(

@@ -44,7 +44,7 @@ internal fun AppsPage(apps: List<AppEntry>) {
         item {
             GlassRow(
                 title = "Show system apps",
-                subtitle = "Apps that came with Fire OS. They can't be uninstalled.",
+                subtitle = "Apps that came with the TV. They can't be uninstalled.",
                 toggle = showSystem,
                 onClick = { showSystem = !showSystem },
                 modifier = Modifier.focusRequester(first),

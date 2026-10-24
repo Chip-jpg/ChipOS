@@ -274,7 +274,7 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
             )
         }
 
-        item { SectionTitle("Fire OS") }
+        item { SectionTitle("TV") }
         items(shortcuts.size) { index ->
             val shortcut = shortcuts[index]
             GlassRow(
@@ -286,7 +286,7 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
         }
         item {
             GlassRow(
-                title = "All Fire OS settings",
+                title = "All TV settings",
                 subtitle = "Open the full system Settings app",
                 value = "›",
                 onClick = { SystemActions.openSettings(context) },

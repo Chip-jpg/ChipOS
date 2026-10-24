@@ -70,7 +70,7 @@ internal fun AboutPage() {
         item {
             GlassRow(
                 title = "Software update and factory reset",
-                subtitle = "These live in the Fire OS settings.",
+                subtitle = "These live in the TV settings.",
                 value = "›",
                 onClick = { SystemActions.open(context, updates) },
             )

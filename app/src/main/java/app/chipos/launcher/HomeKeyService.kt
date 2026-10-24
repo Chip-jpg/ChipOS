@@ -43,7 +43,7 @@ class HomeKeyService : AccessibilityService() {
 
     /** If Amazon's screen is still showing a moment later, try again. */
     private val retry = Runnable {
-        if (currentPackage == AMAZON_LAUNCHER) openChipOs()
+        if (currentPackage == AMAZON_LAUNCHER || currentPackage == ANDROID_TV_LAUNCHER) openChipOs()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -51,8 +51,10 @@ class HomeKeyService : AccessibilityService() {
         val pkg = event.packageName?.toString() ?: return
         val cls = event.className?.toString().orEmpty()
 
-        val isHome = pkg == AMAZON_LAUNCHER && cls.contains("HomeActivity", ignoreCase = true)
-        if (pkg == AMAZON_LAUNCHER && !isHome) return
+        // Fire OS home, or the Android TV home (Sony Bravia): used when the stock launcher is still enabled.
+        val isHome = (pkg == AMAZON_LAUNCHER && cls.contains("HomeActivity", ignoreCase = true)) ||
+            (pkg == ANDROID_TV_LAUNCHER && cls.endsWith("MainActivity"))
+        if ((pkg == AMAZON_LAUNCHER || pkg == ANDROID_TV_LAUNCHER) && !isHome) return
         currentPackage = pkg
         if (!isHome) return
 
@@ -70,5 +72,6 @@ class HomeKeyService : AccessibilityService() {
 
     private companion object {
         const val AMAZON_LAUNCHER = "com.amazon.tv.launcher"
+        const val ANDROID_TV_LAUNCHER = "com.google.android.tvlauncher"
     }
 }

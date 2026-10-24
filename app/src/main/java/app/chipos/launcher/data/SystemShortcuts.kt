@@ -21,7 +21,7 @@ object SystemShortcuts {
         SystemShortcut("Accessibility", "Captions, screen reader, magnifier", Settings.ACTION_ACCESSIBILITY_SETTINGS),
         SystemShortcut("Date & time", "Time zone and clock", Settings.ACTION_DATE_SETTINGS),
         SystemShortcut("Language & keyboard", "Menu language and keyboards", Settings.ACTION_LOCALE_SETTINGS),
-        SystemShortcut("Updates, restart & reset", "My Fire TV: software update and factory reset", Settings.ACTION_DEVICE_INFO_SETTINGS),
+        SystemShortcut("Updates, restart & reset", "Software update and factory reset", Settings.ACTION_DEVICE_INFO_SETTINGS),
         SystemShortcut("Developer options", "ADB debugging", Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS),
     )
 }

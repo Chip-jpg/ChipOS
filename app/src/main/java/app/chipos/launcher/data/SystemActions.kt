@@ -49,6 +49,6 @@ object SystemActions {
                 // Try the next route.
             }
         }
-        Toast.makeText(context, "Couldn't open Settings. Try holding the Home button.", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Couldn't open Settings.", Toast.LENGTH_LONG).show()
     }
 }
