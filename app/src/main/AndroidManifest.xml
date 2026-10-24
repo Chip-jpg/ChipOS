@@ -78,7 +78,7 @@
             android:resumeWhilePausing="true"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
 
             <!-- Makes ChipOS selectable as the home screen. -->
             <intent-filter>

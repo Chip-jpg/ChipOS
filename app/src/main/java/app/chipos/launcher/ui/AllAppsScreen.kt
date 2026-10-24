@@ -42,7 +42,7 @@ import kotlinx.coroutines.delay
  */
 @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
-fun AllAppsScreen(apps: List<AppEntry>, onAppOptions: (AppEntry) -> Unit) {
+fun AllAppsScreen(apps: List<AppEntry>, resumed: Boolean, onAppOptions: (AppEntry) -> Unit) {
     val context = LocalContext.current
     val firstTile = remember { FocusRequester() }
     var query by remember { mutableStateOf("") }
@@ -60,6 +60,22 @@ fun AllAppsScreen(apps: List<AppEntry>, onAppOptions: (AppEntry) -> Unit) {
             } catch (e: Exception) {
                 // Not attached yet; the first D-pad press will pick a target.
             }
+        }
+    }
+
+    // Coming back from an app, Android puts focus on the first thing on screen, which is the search
+    // box, and opens the keyboard for it. Put focus back on the apps and close the keyboard.
+    LaunchedEffect(resumed) {
+        if (resumed && apps.isNotEmpty()) {
+            delay(250)
+            keyboard?.hide()
+            try {
+                firstTile.requestFocus()
+            } catch (e: Exception) {
+                // Not attached yet; the first D-pad press will pick a target.
+            }
+            delay(450)
+            keyboard?.hide()
         }
     }
 

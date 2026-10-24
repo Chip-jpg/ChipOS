@@ -133,7 +133,11 @@ fun ChipOsApp(
                     onOpenSettings = { screen = Screen.Settings },
                     onAppOptions = { optionsFor = it },
                 )
-                Screen.AllApps -> AllAppsScreen(apps = visibleApps, onAppOptions = { optionsFor = it })
+                Screen.AllApps -> AllAppsScreen(
+                    apps = visibleApps,
+                    resumed = resumed,
+                    onAppOptions = { optionsFor = it },
+                )
                 Screen.Settings -> SettingsScreen(apps = apps)
             }
         }
