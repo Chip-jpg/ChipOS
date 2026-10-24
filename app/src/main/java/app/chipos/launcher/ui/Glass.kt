@@ -20,22 +20,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -43,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,88 +96,142 @@ class ContinuousCornerShape(private val radius: Dp) : Shape {
 /**
  * A "liquid glass" surface, drawn behind the content in a single pass.
  *
- * Android 9 and 10 cannot blur what is behind a view, so the effect is built from layers:
- *  1. a translucent white body, lighter at the top;
- *  2. a sheen across the top of the surface, like light on a curved pane;
- *  3. a small specular glint near the upper left corner;
+ * Android 9 and 10 cannot blur what is behind a view, so the wallpaper is blurred ahead of time
+ * ([GlassBackdrop]) and the part behind this surface is drawn inside it. On top of that:
+ *  1. a thin white veil, a little lighter at the top;
+ *  2. a sheen across the top, like light on a curved pane;
+ *  3. a small glint near the upper left corner;
  *  4. a faint glow gathering along the bottom edge;
  *  5. a soft light just inside the edge, where real glass bends the light;
- *  6. a rim line that is bright along the top, dimmer on the sides and medium along the bottom;
- *  7. when focused, a near-solid white fill fades in over the body.
+ *  6. a hairline rim, bright along the top, dim on the sides, medium along the bottom;
+ *  7. when focused, a near-solid white fill fades in over everything.
  *
  * All brushes are built once per size and reused. [focus] is read while drawing, so animating it
  * redraws this surface only and never recomposes anything.
  *
  * It does not clip children. Add `.clip(shape)` after it where content can overflow (scrolling lists).
  *
- * @param restTop opacity of the body at the top edge when resting.
- * @param restBottom opacity of the body at the bottom edge when resting.
+ * @param restTop opacity of the white veil at the top edge when resting.
+ * @param restBottom opacity of the white veil at the bottom edge when resting.
  * @param focus 0 = resting, 1 = focused.
+ * @param frost draw the blurred wallpaper inside. Turn off for small pieces that sit on another glass surface.
  */
 fun Modifier.liquidGlass(
     shape: Shape,
     restTop: Float = 0.30f,
     restBottom: Float = 0.12f,
     focus: () -> Float = NoFocus,
-): Modifier = drawWithCache {
-    val outline = shape.createOutline(size, layoutDirection, this)
-    val clip = outline.toPath()
-    val rimWidth = 1.5.dp.toPx()
-    val edgeWidth = 14.dp.toPx() // half of this falls inside the shape
+    frost: Boolean = true,
+): Modifier = composed {
+    // Where this surface is on the screen, so it knows which part of the backdrop to draw.
+    var origin by remember { mutableStateOf(Offset.Zero) }
 
-    val body = Brush.verticalGradient(
-        listOf(Color.White.copy(alpha = restTop), Color.White.copy(alpha = restBottom)),
-    )
-    val focusFill = Brush.verticalGradient(
-        listOf(Color.White.copy(alpha = 0.94f), Color.White.copy(alpha = 0.88f)),
-    )
-    // Light across the top of the pane, fading out by the middle.
-    val topSheen = Brush.verticalGradient(
-        0f to Color.White.copy(alpha = 0.16f),
-        0.5f to Color.Transparent,
-        startY = 0f,
-        endY = size.height,
-    )
-    // Small and tied to the surface's height, so wide shelves do not get a huge hazy patch.
-    val glint = Brush.radialGradient(
-        colors = listOf(Color.White.copy(alpha = 0.26f), Color.Transparent),
-        center = Offset(size.width * 0.10f, 0f),
-        radius = size.minDimension * 1.5f,
-    )
-    val lowerGlow = Brush.verticalGradient(
-        0.72f to Color.Transparent,
-        1f to Color.White.copy(alpha = 0.13f),
-        startY = 0f,
-        endY = size.height,
-    )
-    // Light bending at the inside of the edge: strongest at the top, a little at the bottom.
-    val innerEdge = Brush.verticalGradient(
-        0f to Color.White.copy(alpha = 0.24f),
-        0.5f to Color.White.copy(alpha = 0.04f),
-        1f to Color.White.copy(alpha = 0.12f),
-        startY = 0f,
-        endY = size.height,
-    )
-    val rim = Brush.verticalGradient(
-        0f to Color.White.copy(alpha = 0.72f),
-        0.45f to Color.White.copy(alpha = 0.12f),
-        1f to Color.White.copy(alpha = 0.40f),
-        startY = 0f,
-        endY = size.height,
-    )
+    this
+        .onGloballyPositioned { origin = it.positionInWindow() }
+        .drawWithCache {
+            val outline = shape.createOutline(size, layoutDirection, this)
+            val clip = outline.toPath()
+            val rimWidth = 1.5.dp.toPx()
+            val edgeWidth = 6.dp.toPx() // half of this falls inside the shape
+            // With a backdrop behind it the veil can be thinner; without one it carries the whole look.
+            val lift = if (frost) 0.05f else 0f
 
-    onDrawBehind {
-        val f = focus()
-        drawOutline(outline, body)
-        if (f > 0.01f) drawOutline(outline, focusFill, alpha = f)
-        val rest = 1f - 0.6f * f
-        drawOutline(outline, topSheen, alpha = rest)
-        drawOutline(outline, glint, alpha = 1f - 0.55f * f)
-        drawOutline(outline, lowerGlow, alpha = rest)
-        clipPath(clip) {
-            drawOutline(outline, innerEdge, alpha = rest, style = Stroke(edgeWidth))
+            val body = Brush.verticalGradient(
+                listOf(
+                    Color.White.copy(alpha = restTop + lift),
+                    Color.White.copy(alpha = restBottom + lift),
+                ),
+            )
+            val focusFill = Brush.verticalGradient(
+                listOf(Color.White.copy(alpha = 0.94f), Color.White.copy(alpha = 0.88f)),
+            )
+            val topSheen = Brush.verticalGradient(
+                0f to Color.White.copy(alpha = 0.14f),
+                0.5f to Color.Transparent,
+                startY = 0f,
+                endY = size.height,
+            )
+            // Small and tied to the surface's height, so wide shelves do not get a huge hazy patch.
+            val glint = Brush.radialGradient(
+                colors = listOf(Color.White.copy(alpha = 0.24f), Color.Transparent),
+                center = Offset(size.width * 0.10f, 0f),
+                radius = size.minDimension * 1.4f,
+            )
+            val lowerGlow = Brush.verticalGradient(
+                0.74f to Color.Transparent,
+                1f to Color.White.copy(alpha = 0.10f),
+                startY = 0f,
+                endY = size.height,
+            )
+            val innerEdge = Brush.verticalGradient(
+                0f to Color.White.copy(alpha = 0.16f),
+                0.5f to Color.White.copy(alpha = 0.02f),
+                1f to Color.White.copy(alpha = 0.08f),
+                startY = 0f,
+                endY = size.height,
+            )
+            val rim = Brush.verticalGradient(
+                0f to Color.White.copy(alpha = 0.70f),
+                0.45f to Color.White.copy(alpha = 0.14f),
+                1f to Color.White.copy(alpha = 0.38f),
+                startY = 0f,
+                endY = size.height,
+            )
+
+            onDrawBehind {
+                val f = focus()
+                if (frost) {
+                    clipPath(clip) { drawBackdrop(origin) }
+                }
+                drawOutline(outline, body)
+                if (f > 0.01f) drawOutline(outline, focusFill, alpha = f)
+                val rest = 1f - 0.6f * f
+                drawOutline(outline, topSheen, alpha = rest)
+                drawOutline(outline, glint, alpha = 1f - 0.55f * f)
+                drawOutline(outline, lowerGlow, alpha = rest)
+                clipPath(clip) {
+                    drawOutline(outline, innerEdge, alpha = rest, style = Stroke(edgeWidth))
+                }
+                drawOutline(outline, rim, style = Stroke(rimWidth))
+            }
         }
-        drawOutline(outline, rim, style = Stroke(rimWidth))
+}
+
+/**
+ * Draws the blurred wallpaper so that it lines up with the screen: [origin] is where this surface's
+ * top left corner is in the window. Draw it inside a clip of the surface's shape.
+ */
+private fun DrawScope.drawBackdrop(origin: Offset) {
+    val current = GlassBackdrop.image ?: return
+    val previous = GlassBackdrop.previous
+    val mix = GlassBackdrop.mix
+    val scaleX = GlassBackdrop.screenWidth / current.width
+    val scaleY = GlassBackdrop.screenHeight / current.height
+    val fading = previous != null && mix < 1f
+
+    withTransform({
+        translate(-origin.x, -origin.y)
+        scale(scaleX, scaleY, pivot = Offset.Zero)
+    }) {
+        if (fading && previous != null) {
+            drawImage(
+                image = previous,
+                srcOffset = IntOffset.Zero,
+                srcSize = IntSize(previous.width, previous.height),
+                dstOffset = IntOffset.Zero,
+                dstSize = IntSize(previous.width, previous.height),
+                filterQuality = FilterQuality.High,
+            )
+        }
+        drawImage(
+            image = current,
+            srcOffset = IntOffset.Zero,
+            srcSize = IntSize(current.width, current.height),
+            dstOffset = IntOffset.Zero,
+            dstSize = IntSize(current.width, current.height),
+            alpha = if (fading) mix else 1f,
+            filterQuality = FilterQuality.High,
+        )
     }
 }
 
@@ -214,8 +276,9 @@ fun Modifier.glassSheen(shape: Shape, glow: () -> Float): Modifier = drawWithCac
 }
 
 /**
- * Text that looks like frosted glass: a bright fill that is very slightly translucent toward the
- * bottom, with a wide, soft shadow (no dark outline) so it stays readable on any wallpaper.
+ * Text that looks like frosted glass: a bright solid fill with a wide, soft shadow (no dark
+ * outline) so it stays readable on any wallpaper. The fill is a plain color on purpose: a gradient
+ * brush combined with a shadow rendered wrongly on some TVs.
  */
 @Composable
 fun GlassText(
@@ -231,7 +294,7 @@ fun GlassText(
     // The style is rebuilt only when one of its inputs changes, not on every recomposition.
     val style = remember(color, fontSize, fontWeight, letterSpacing, textAlign) {
         TextStyle(
-            brush = Brush.verticalGradient(listOf(color, color.copy(alpha = color.alpha * 0.86f))),
+            color = color,
             fontFamily = ChipFont,
             fontSize = fontSize,
             fontWeight = fontWeight,

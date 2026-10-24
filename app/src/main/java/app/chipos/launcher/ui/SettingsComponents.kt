@@ -189,6 +189,7 @@ internal fun GlassRow(
                 restTop = 0.10f,
                 restBottom = 0.04f,
                 focus = { focus.value },
+                frost = false,
             )
             .then(modifier)
             .onFocusChanged {
@@ -237,7 +238,7 @@ internal fun GlassSwitch(on: Boolean, focused: Boolean) {
     Box(
         Modifier
             .size(width = 56.dp, height = 32.dp)
-            .liquidGlass(CircleShape, restTop = 0.14f, restBottom = 0.06f)
+            .liquidGlass(CircleShape, restTop = 0.14f, restBottom = 0.06f, frost = false)
             .background(trackColor.copy(alpha = 0.55f * position.value), CircleShape)
             .padding(3.dp),
     ) {
@@ -333,6 +334,7 @@ internal fun GlassField(
                 ContinuousCornerShape(22.dp),
                 restTop = if (focused) 0.26f else 0.12f,
                 restBottom = if (focused) 0.16f else 0.05f,
+                frost = false,
             ),
     ) {
         BasicTextField(

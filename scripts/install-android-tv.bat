@@ -25,11 +25,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-adb shell pm grant app.chipos.launcher android.permission.ACCESS_FINE_LOCATION
-adb shell pm grant app.chipos.launcher android.permission.WRITE_SECURE_SETTINGS
-adb shell cmd notification allow_listener app.chipos.launcher/app.chipos.launcher.NowPlayingListener
-rem Turns on the TV's system sounds, which ChipOS uses for its navigation clicks.
-adb shell settings put system sound_effects_enabled 1
+call "%~dp0android-tv-permissions.bat" nopause
 adb shell am start -n app.chipos.launcher/.MainActivity
 echo.
 echo ChipOS installed and started. The TV's own home screen is still enabled. System sounds were turned on.

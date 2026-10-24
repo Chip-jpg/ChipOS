@@ -63,6 +63,16 @@ fun WallpaperLayer(resumed: Boolean) {
         }
     }
 
+    // The blurred copy that glass surfaces draw behind themselves.
+    LaunchedEffect(bitmap) {
+        val source = bitmap ?: return@LaunchedEffect
+        val blurred = withContext(Dispatchers.Default) {
+            GlassBackdrop.build(source, metrics.widthPixels, metrics.heightPixels)
+        } ?: return@LaunchedEffect
+        GlassBackdrop.setScreen(metrics.widthPixels, metrics.heightPixels)
+        GlassBackdrop.crossfadeTo(blurred)
+    }
+
     Crossfade(
         targetState = bitmap,
         animationSpec = tween(durationMillis = 2000),
