@@ -68,7 +68,11 @@ fun WallpaperLayer(resumed: Boolean) {
         val source = bitmap ?: return@LaunchedEffect
         val blurred = withContext(Dispatchers.Default) {
             GlassBackdrop.build(source, metrics.widthPixels, metrics.heightPixels)
-        } ?: return@LaunchedEffect
+        }
+        if (blurred == null) {
+            android.util.Log.w("ChipOS", "Glass backdrop could not be built")
+            return@LaunchedEffect
+        }
         GlassBackdrop.setScreen(metrics.widthPixels, metrics.heightPixels)
         GlassBackdrop.crossfadeTo(blurred)
     }
