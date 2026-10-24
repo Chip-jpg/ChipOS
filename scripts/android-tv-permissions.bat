@@ -13,6 +13,7 @@ rem
 rem Everything else ChipOS asks for (internet, Wi-Fi, Bluetooth, boot, uninstall) is granted at install.
 rem Undo the listener with:
 rem   adb shell cmd notification disallow_listener app.chipos.launcher/app.chipos.launcher.NowPlayingListener
+setlocal enabledelayedexpansion
 set PKG=app.chipos.launcher
 set LISTENER=%PKG%/%PKG%.NowPlayingListener
 
@@ -32,8 +33,8 @@ adb shell settings get secure enabled_notification_listeners | findstr /c:"%PKG%
 if errorlevel 1 (
   echo The first method did not work, trying the settings method...
   for /f "delims=" %%L in ('adb shell settings get secure enabled_notification_listeners') do set CURRENT=%%L
-  if /i "%CURRENT%"=="null" (set CURRENT=) else if "%CURRENT%"=="" (set CURRENT=) else set CURRENT=%CURRENT%:
-  adb shell settings put secure enabled_notification_listeners "%CURRENT%%LISTENER%"
+  if /i "!CURRENT!"=="null" (set CURRENT=) else if not "!CURRENT!"=="" set CURRENT=!CURRENT!:
+  adb shell settings put secure enabled_notification_listeners "!CURRENT!%LISTENER%"
 )
 
 adb shell settings put system sound_effects_enabled 1
