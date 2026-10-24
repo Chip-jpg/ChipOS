@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
@@ -87,12 +88,14 @@ class ContinuousCornerShape(private val radius: Dp) : Shape {
 /**
  * A "liquid glass" surface, drawn behind the content in a single pass.
  *
- * Fire OS 7 (Android 9) cannot blur what is behind a view, so the effect is built from layers:
+ * Android 9 and 10 cannot blur what is behind a view, so the effect is built from layers:
  *  1. a translucent white body, lighter at the top;
- *  2. a soft specular highlight in the upper left;
- *  3. a faint bright band along the bottom edge, like light gathering at the lower rim;
- *  4. a rim light that is bright at the top left and bottom right and dim in between;
- *  5. when focused, a near-solid white fill fades in over the body.
+ *  2. a sheen across the top of the surface, like light on a curved pane;
+ *  3. a small specular glint near the upper left corner;
+ *  4. a faint glow gathering along the bottom edge;
+ *  5. a soft light just inside the edge, where real glass bends the light;
+ *  6. a rim line that is bright along the top, dimmer on the sides and medium along the bottom;
+ *  7. when focused, a near-solid white fill fades in over the body.
  *
  * All brushes are built once per size and reused. [focus] is read while drawing, so animating it
  * redraws this surface only and never recomposes anything.
@@ -110,7 +113,9 @@ fun Modifier.liquidGlass(
     focus: () -> Float = NoFocus,
 ): Modifier = drawWithCache {
     val outline = shape.createOutline(size, layoutDirection, this)
-    val rimWidth = 2.dp.toPx()
+    val clip = outline.toPath()
+    val rimWidth = 1.5.dp.toPx()
+    val edgeWidth = 14.dp.toPx() // half of this falls inside the shape
 
     val body = Brush.verticalGradient(
         listOf(Color.White.copy(alpha = restTop), Color.White.copy(alpha = restBottom)),
@@ -118,36 +123,61 @@ fun Modifier.liquidGlass(
     val focusFill = Brush.verticalGradient(
         listOf(Color.White.copy(alpha = 0.94f), Color.White.copy(alpha = 0.88f)),
     )
-    val specular = Brush.radialGradient(
-        colors = listOf(Color.White.copy(alpha = 0.30f), Color.Transparent),
-        center = Offset(size.width * 0.18f, size.height * 0.05f),
-        radius = size.maxDimension * 0.7f,
-    )
-    val lowerGlow = Brush.verticalGradient(
-        0.70f to Color.Transparent,
-        1f to Color.White.copy(alpha = 0.16f),
+    // Light across the top of the pane, fading out by the middle.
+    val topSheen = Brush.verticalGradient(
+        0f to Color.White.copy(alpha = 0.16f),
+        0.5f to Color.Transparent,
         startY = 0f,
         endY = size.height,
     )
-    val rim = Brush.linearGradient(
-        colors = listOf(
-            Color.White.copy(alpha = 0.90f),
-            Color.White.copy(alpha = 0.08f),
-            Color.White.copy(alpha = 0.08f),
-            Color.White.copy(alpha = 0.50f),
-        ),
-        start = Offset.Zero,
-        end = Offset(size.width, size.height),
+    // Small and tied to the surface's height, so wide shelves do not get a huge hazy patch.
+    val glint = Brush.radialGradient(
+        colors = listOf(Color.White.copy(alpha = 0.26f), Color.Transparent),
+        center = Offset(size.width * 0.10f, 0f),
+        radius = size.minDimension * 1.5f,
+    )
+    val lowerGlow = Brush.verticalGradient(
+        0.72f to Color.Transparent,
+        1f to Color.White.copy(alpha = 0.13f),
+        startY = 0f,
+        endY = size.height,
+    )
+    // Light bending at the inside of the edge: strongest at the top, a little at the bottom.
+    val innerEdge = Brush.verticalGradient(
+        0f to Color.White.copy(alpha = 0.24f),
+        0.5f to Color.White.copy(alpha = 0.04f),
+        1f to Color.White.copy(alpha = 0.12f),
+        startY = 0f,
+        endY = size.height,
+    )
+    val rim = Brush.verticalGradient(
+        0f to Color.White.copy(alpha = 0.72f),
+        0.45f to Color.White.copy(alpha = 0.12f),
+        1f to Color.White.copy(alpha = 0.40f),
+        startY = 0f,
+        endY = size.height,
     )
 
     onDrawBehind {
         val f = focus()
         drawOutline(outline, body)
         if (f > 0.01f) drawOutline(outline, focusFill, alpha = f)
-        drawOutline(outline, specular, alpha = 1f - 0.55f * f)
-        drawOutline(outline, lowerGlow, alpha = 1f - 0.6f * f)
+        val rest = 1f - 0.6f * f
+        drawOutline(outline, topSheen, alpha = rest)
+        drawOutline(outline, glint, alpha = 1f - 0.55f * f)
+        drawOutline(outline, lowerGlow, alpha = rest)
+        clipPath(clip) {
+            drawOutline(outline, innerEdge, alpha = rest, style = Stroke(edgeWidth))
+        }
         drawOutline(outline, rim, style = Stroke(rimWidth))
     }
+}
+
+/** The shape's outline as a path, so it can be used to clip. */
+private fun Outline.toPath(): Path = when (this) {
+    is Outline.Generic -> path
+    is Outline.Rounded -> Path().apply { addRoundRect(roundRect) }
+    is Outline.Rectangle -> Path().apply { addRect(rect) }
 }
 
 /**
@@ -184,8 +214,8 @@ fun Modifier.glassSheen(shape: Shape, glow: () -> Float): Modifier = drawWithCac
 }
 
 /**
- * Text that looks like frosted glass: a bright-to-translucent vertical gradient fill with a soft
- * shadow so it stays readable on any wallpaper.
+ * Text that looks like frosted glass: a bright fill that is very slightly translucent toward the
+ * bottom, with a wide, soft shadow (no dark outline) so it stays readable on any wallpaper.
  */
 @Composable
 fun GlassText(
@@ -201,16 +231,16 @@ fun GlassText(
     // The style is rebuilt only when one of its inputs changes, not on every recomposition.
     val style = remember(color, fontSize, fontWeight, letterSpacing, textAlign) {
         TextStyle(
-            brush = Brush.verticalGradient(listOf(color, color.copy(alpha = color.alpha * 0.66f))),
+            brush = Brush.verticalGradient(listOf(color, color.copy(alpha = color.alpha * 0.86f))),
             fontFamily = ChipFont,
             fontSize = fontSize,
             fontWeight = fontWeight,
             letterSpacing = letterSpacing,
             textAlign = textAlign,
             shadow = Shadow(
-                color = Color.Black.copy(alpha = 0.45f),
-                offset = Offset(0f, 2f),
-                blurRadius = 8f,
+                color = Color.Black.copy(alpha = 0.30f),
+                offset = Offset(0f, 3f),
+                blurRadius = 16f,
             ),
         )
     }

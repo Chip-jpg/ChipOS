@@ -21,6 +21,7 @@ object ChipPrefs {
     private const val KEY_AMBIENT = "ambient_minutes"
     private const val KEY_RECENTS = "show_recents"
     private const val KEY_WALLPAPER_MODE = "wallpaper_mode"
+    private const val KEY_NAV_SOUNDS = "nav_sounds"
     private const val KEY_WEATHER_NAME = "weather_name"
     private const val KEY_WEATHER_LAT = "weather_lat"
     private const val KEY_WEATHER_LON = "weather_lon"
@@ -52,6 +53,8 @@ object ChipPrefs {
         private set
     var wallpaperMode by mutableIntStateOf(0)
         private set
+    var navSounds by mutableStateOf(true)
+        private set
 
     /** Saved weather city ("" = weather off). The name is state so the UI updates; coordinates are not. */
     var weatherName by mutableStateOf("")
@@ -73,6 +76,7 @@ object ChipPrefs {
         showRecents = prefs.getBoolean(KEY_RECENTS, true)
         ambientMinutes = prefs.getInt(KEY_AMBIENT, 5)
         wallpaperMode = prefs.getInt(KEY_WALLPAPER_MODE, 0)
+        navSounds = prefs.getBoolean(KEY_NAV_SOUNDS, true)
         weatherLatitude = prefs.getString(KEY_WEATHER_LAT, null)?.toDoubleOrNull() ?: 0.0
         weatherLongitude = prefs.getString(KEY_WEATHER_LON, null)?.toDoubleOrNull() ?: 0.0
         weatherName = prefs.getString(KEY_WEATHER_NAME, "") ?: ""
@@ -121,6 +125,11 @@ object ChipPrefs {
     fun toggle24Hour() {
         use24Hour = !use24Hour
         store?.edit()?.putBoolean(KEY_24_HOUR, use24Hour)?.apply()
+    }
+
+    fun toggleNavSounds() {
+        navSounds = !navSounds
+        store?.edit()?.putBoolean(KEY_NAV_SOUNDS, navSounds)?.apply()
     }
 
     fun toggleGreeting() {

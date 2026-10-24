@@ -18,6 +18,7 @@ import app.chipos.launcher.data.DockStore
 import app.chipos.launcher.data.HiddenApps
 import app.chipos.launcher.data.RecentApps
 import app.chipos.launcher.data.KeyState
+import app.chipos.launcher.data.NavSounds
 import app.chipos.launcher.data.NowPlaying
 import app.chipos.launcher.ui.ChipOsApp
 
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
         DockStore.init(this)
         HiddenApps.init(this)
         RecentApps.init(this)
+        NavSounds.init(this)
 
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
                 return true
             }
             KeyState.lastKeyTime = SystemClock.elapsedRealtime()
+            NavSounds.onKey(event)
         }
 
         // Back from All apps or Settings: act on the press itself so it always takes exactly one press.

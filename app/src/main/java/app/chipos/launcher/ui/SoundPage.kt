@@ -24,6 +24,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import app.chipos.launcher.data.ChipPrefs
 
 /** Sound: media volume and mute. */
 @Composable
@@ -81,6 +82,14 @@ internal fun SoundPage() {
                     muted = audio.isStreamMute(AudioManager.STREAM_MUSIC)
                     volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
                 },
+            )
+        }
+        item {
+            GlassRow(
+                title = "Navigation sounds",
+                subtitle = "Clicks when you move, select and go back. Needs the TV's system sounds turned on",
+                toggle = ChipPrefs.navSounds,
+                onClick = { ChipPrefs.toggleNavSounds() },
             )
         }
         item {
