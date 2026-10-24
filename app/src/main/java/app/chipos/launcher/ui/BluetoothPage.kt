@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import app.chipos.launcher.data.Strings
 import app.chipos.launcher.data.BluetoothTools
 
 /** Bluetooth: turn it on or off, pair new devices, and forget paired ones. */
@@ -55,7 +56,7 @@ internal fun BluetoothPage() {
     }
     var selected by remember { mutableStateOf<BluetoothDevice?>(null) }
 
-    fun toast(message: String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    fun toast(message: String) = Toast.makeText(context, Strings.t(message), Toast.LENGTH_SHORT).show()
 
     fun startSearch() {
         if (!adapter.isEnabled) return

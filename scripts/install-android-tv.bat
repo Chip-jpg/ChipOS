@@ -26,6 +26,8 @@ if errorlevel 1 (
 )
 
 call "%~dp0android-tv-permissions.bat" nopause
+echo Optimizing ChipOS for speed (takes a few seconds)...
+adb shell cmd package compile -m speed -f app.chipos.launcher
 adb shell am start -n app.chipos.launcher/.MainActivity
 echo.
 echo ChipOS installed and started. The TV's own home screen is still enabled. System sounds were turned on.

@@ -28,7 +28,7 @@ object Weather {
     suspend fun findCity(query: String): Place? = withContext(Dispatchers.IO) {
         try {
             val url = "https://geocoding-api.open-meteo.com/v1/search?name=" +
-                URLEncoder.encode(query.trim(), "UTF-8") + "&count=1&language=en&format=json"
+                URLEncoder.encode(query.trim(), "UTF-8") + "&count=1&language=${if (ChipPrefs.italian) "it" else "en"}&format=json"
             val result = JSONObject(download(url)).optJSONArray("results")?.optJSONObject(0)
                 ?: return@withContext null
             val country = result.optString("country_code")

@@ -70,7 +70,18 @@ object WallpaperSource {
                 inSampleSize = sample
                 inPreferredConfig = Bitmap.Config.ARGB_8888
             }
-            open().use { BitmapFactory.decodeStream(it, null, options) }?.asImageBitmap()
+            val decoded = open().use { BitmapFactory.decodeStream(it, null, options) } ?: return null
+            // Shrink to just cover the screen, so every frame of the cross-fade draws fewer pixels.
+            val cover = maxOf(targetWidth / decoded.width.toFloat(), targetHeight / decoded.height.toFloat())
+            val fitted = if (cover < 0.95f) {
+                Bitmap.createScaledBitmap(
+                    decoded,
+                    (decoded.width * cover).toInt().coerceAtLeast(targetWidth),
+                    (decoded.height * cover).toInt().coerceAtLeast(targetHeight),
+                    true,
+                ).also { if (it !== decoded) decoded.recycle() }
+            } else decoded
+            fitted.asImageBitmap()
         } catch (e: Exception) {
             null
         } catch (e: OutOfMemoryError) {

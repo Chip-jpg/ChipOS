@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.chipos.launcher.data.Strings
 import app.chipos.launcher.data.AppEntry
 import app.chipos.launcher.data.ChipPrefs
 import app.chipos.launcher.data.DockItem
@@ -299,16 +300,17 @@ internal fun ClockBlock(
 
     val use24Hour = ChipPrefs.use24Hour
     val timeFormat = remember(use24Hour) {
-        DateTimeFormatter.ofPattern(if (use24Hour) "HH:mm" else "h:mm a", Locale.getDefault())
+        DateTimeFormatter.ofPattern(if (use24Hour) "HH:mm" else "h:mm a", Locale.ENGLISH)
     }
     val weather = Weather.now
-    val dateFormat = remember { DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.getDefault()) }
+    val italian = ChipPrefs.italian
+    val dateFormat = remember(italian) { DateTimeFormatter.ofPattern("EEEE d MMMM", Strings.locale) }
     val time = timeFormat.format(now)
     val date = dateFormat.format(now)
     val greeting = when (now.hour) {
-        in 5..11 -> "Good morning"
-        in 12..17 -> "Good afternoon"
-        else -> "Good evening"
+        in 5..11 -> Strings.t("Good morning")
+        in 12..17 -> Strings.t("Good afternoon")
+        else -> Strings.t("Good evening")
     }
 
     Column(horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start) {
@@ -326,7 +328,7 @@ internal fun ClockBlock(
         )
         if (showDetails && weather != null) {
             GlassText(
-                text = "${weather.temperatureC}\u00B0  \u00B7  ${weather.description}  \u00B7  ${weather.city}",
+                text = "${weather.temperatureC}\u00B0  \u00B7  ${Strings.t(weather.description)}  \u00B7  ${weather.city}",
                 fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White.copy(alpha = 0.82f),

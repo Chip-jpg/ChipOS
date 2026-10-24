@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import app.chipos.launcher.data.Strings
 import app.chipos.launcher.data.AppEntry
 import app.chipos.launcher.data.DockStore
 import app.chipos.launcher.data.HiddenApps
@@ -56,7 +57,7 @@ internal fun AppOptionsDialog(entry: AppEntry, onDismiss: () -> Unit) {
                         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                     )
                 } catch (e: Exception) {
-                    Toast.makeText(context, "App info isn't available on this device", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, Strings.t("App info isn't available on this device"), Toast.LENGTH_SHORT).show()
                 }
             },
         )
@@ -71,7 +72,7 @@ internal fun AppOptionsDialog(entry: AppEntry, onDismiss: () -> Unit) {
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                         )
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Couldn't start the uninstaller", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, Strings.t("Couldn't start the uninstaller"), Toast.LENGTH_SHORT).show()
                     }
                 },
             )

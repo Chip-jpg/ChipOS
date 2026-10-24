@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import app.chipos.launcher.data.Strings
 import app.chipos.launcher.data.SystemActions
 import app.chipos.launcher.data.SystemShortcut
 import app.chipos.launcher.data.WifiNetwork
@@ -62,7 +63,7 @@ internal fun WifiPage() {
         refresh()
     }
 
-    fun toast(message: String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    fun toast(message: String) = Toast.makeText(context, Strings.t(message), Toast.LENGTH_SHORT).show()
 
     fun join(network: WifiNetwork, pass: String?) {
         if (WifiTools.connect(wm, network, pass)) {

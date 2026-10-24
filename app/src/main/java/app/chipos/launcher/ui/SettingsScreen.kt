@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.DisposableEffect
+import app.chipos.launcher.data.Strings
 import app.chipos.launcher.data.BackState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
@@ -129,6 +130,15 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
             )
         }
 
+        item {
+            GlassRow(
+                title = "Language",
+                subtitle = "English or Italiano",
+                value = if (ChipPrefs.italian) "Italiano" else "English",
+                onClick = { ChipPrefs.toggleLanguage() },
+            )
+        }
+
         item { SectionTitle("Speed") }
         item {
             GlassRow(
@@ -136,12 +146,12 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
                 subtitle = if (canChangeSpeed) {
                     "Shorter animations make the whole device feel quicker"
                 } else {
-                    "One-time setup needed: run scripts\\grant-permissions.bat on your PC"
+                    "One-time setup needed: run scripts\\android-tv-permissions.bat on your PC"
                 },
                 value = AnimationSpeed.label(animationScale),
                 onClick = {
                     if (!canChangeSpeed) {
-                        Toast.makeText(context, "Run scripts\\grant-permissions.bat first", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, Strings.t("Run scripts\\android-tv-permissions.bat first"), Toast.LENGTH_LONG).show()
                     } else {
                         val next = AnimationSpeed.next(animationScale)
                         if (AnimationSpeed.set(context, next)) animationScale = next
@@ -157,7 +167,7 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
                 subtitle = if (nowPlayingReady) {
                     "Shows music above the dock. $nowPlayingStatus"
                 } else {
-                    "One-time setup needed: run scripts\\enable-now-playing.bat on your PC"
+                    "One-time setup needed: run scripts\\android-tv-permissions.bat on your PC"
                 },
                 toggle = ChipPrefs.showNowPlaying,
                 onClick = { ChipPrefs.toggleNowPlaying() },
@@ -203,7 +213,7 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
                 value = "Reset",
                 onClick = {
                     DockStore.reset()
-                    Toast.makeText(context, "Dock reset to the default apps", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, Strings.t("Dock reset to the default apps"), Toast.LENGTH_SHORT).show()
                 },
             )
         }
@@ -268,7 +278,7 @@ private fun MainPage(apps: List<AppEntry>, onOpen: (SettingsPage) -> Unit) {
                         } else {
                             "Closed ${result.closed} apps, freed about ${result.freedBytes / (1024 * 1024)} MB"
                         }
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, Strings.t(message), Toast.LENGTH_LONG).show()
                     }
                 },
             )

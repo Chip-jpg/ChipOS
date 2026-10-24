@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ChipOS</string>
+    <string name="home_service_description">Apre ChipOS quando compare la schermata Home di Amazon, così il pulsante Home porta a ChipOS. Vede solo quale finestra di app si è aperta e non legge lo schermo.</string>
+</resources>

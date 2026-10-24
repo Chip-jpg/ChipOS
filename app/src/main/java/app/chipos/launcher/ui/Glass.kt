@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.chipos.launcher.data.Strings
 
 private val NoFocus: () -> Float = { 0f }
 
@@ -227,7 +228,7 @@ private fun DrawScope.drawBackdrop(origin: Offset) {
                 dstOffset = IntOffset.Zero,
                 dstSize = IntSize(previous.width, previous.height),
                 alpha = BACKDROP_ALPHA,
-                filterQuality = FilterQuality.High,
+                filterQuality = FilterQuality.Low,
             )
         }
         drawImage(
@@ -237,7 +238,7 @@ private fun DrawScope.drawBackdrop(origin: Offset) {
             dstOffset = IntOffset.Zero,
             dstSize = IntSize(current.width, current.height),
             alpha = (if (fading) mix else 1f) * BACKDROP_ALPHA,
-            filterQuality = FilterQuality.High,
+            filterQuality = FilterQuality.Low,
         )
     }
 }
@@ -310,7 +311,7 @@ fun GlassText(
         )
     }
     BasicText(
-        text = text,
+        text = Strings.t(text),
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier,

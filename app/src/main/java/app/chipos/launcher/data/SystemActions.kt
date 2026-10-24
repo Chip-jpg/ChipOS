@@ -12,7 +12,7 @@ object SystemActions {
             context.startActivity(entry.launchIntent)
             RecentApps.record(entry.packageName)
         } catch (e: Exception) {
-            Toast.makeText(context, "Couldn't open ${entry.label}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, Strings.t("Couldn't open ${entry.label}"), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -25,7 +25,7 @@ object SystemActions {
         try {
             context.startActivity(Intent(shortcut.action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         } catch (e: Exception) {
-            Toast.makeText(context, "${shortcut.title} isn't available on this device", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, Strings.t("${shortcut.title} isn't available on this device"), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -49,6 +49,6 @@ object SystemActions {
                 // Try the next route.
             }
         }
-        Toast.makeText(context, "Couldn't open Settings.", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, Strings.t("Couldn't open Settings."), Toast.LENGTH_LONG).show()
     }
 }
