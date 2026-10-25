@@ -55,4 +55,10 @@ object RecentApps {
         recent = list
         prefs?.edit()?.putString("recent", list.joinToString("\n"))?.apply()
     }
+
+    fun remove(packageName: String) {
+        val list = recent.filter { it != packageName }
+        recent = list
+        prefs?.edit()?.putString("recent", list.joinToString("\n"))?.apply()
+    }
 }

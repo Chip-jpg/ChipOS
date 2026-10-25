@@ -14,6 +14,7 @@ import app.chipos.launcher.data.Strings
 import app.chipos.launcher.data.AppEntry
 import app.chipos.launcher.data.DockStore
 import app.chipos.launcher.data.HiddenApps
+import app.chipos.launcher.data.RecentApps
 import app.chipos.launcher.data.SystemActions
 
 /**
@@ -44,6 +45,16 @@ internal fun AppOptionsDialog(entry: AppEntry, onDismiss: () -> Unit) {
             },
             modifier = Modifier.focusRequester(first),
         )
+        if (entry.packageName in RecentApps.recent && DockStore.position(entry.packageName) < 0) {
+            OptionRow(
+                title = "Remove from Recent",
+                subtitle = "It comes back the next time you open it",
+                onClick = {
+                    RecentApps.remove(entry.packageName)
+                    onDismiss()
+                },
+            )
+        }
         OptionRow(
             title = "App info",
             subtitle = "Storage, permissions, force stop",

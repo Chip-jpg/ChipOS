@@ -161,6 +161,8 @@ object Strings {
         "All apps" to "Tutte le app",
         "Hold Select on an app for options" to "Tieni premuto Select su un'app per le opzioni",
         "Search apps" to "Cerca app",
+        "Remove from Recent" to "Rimuovi dai Recenti",
+        "It comes back the next time you open it" to "Torna la prossima volta che la apri",
         "Add to dock" to "Aggiungi al dock",
         "App info isn't available on this device" to "Info app non disponibili su questo dispositivo",
         "App info" to "Info app",
