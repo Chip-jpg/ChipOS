@@ -7,6 +7,9 @@ import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -51,6 +54,15 @@ object NowPlaying {
     val isRegistered: Boolean get() = registered
 
     private val AUDIO_HINTS = listOf("spotify", "music", "audio", "radio", "podcast", "deezer", "tidal", "soundcloud")
+
+    /** A paused player is shown for this long, then the card goes away until it plays again. */
+    private const val PAUSE_GRACE_MS = 2 * 60 * 1000L
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val recheck = Runnable { recompute() }
+
+    /** When each app's current pause started (SystemClock.elapsedRealtime). */
+    private val pausedSince = HashMap<String, Long>()
 
     private var manager: MediaSessionManager? = null
     private var component: ComponentName? = null
@@ -118,6 +130,9 @@ object NowPlaying {
         }
         val tracks = controllers.mapNotNull { build(it) }
         track = tracks.firstOrNull { it.playing } ?: tracks.firstOrNull()
+        // A paused card expires, so check again when it is due.
+        handler.removeCallbacks(recheck)
+        if (track != null && track?.playing == false) handler.postDelayed(recheck, 15_000L)
     }
 
     private fun build(controller: MediaController): Track? {
@@ -125,6 +140,16 @@ object NowPlaying {
         val state = controller.playbackState ?: return null
         val playing = state.state == PlaybackState.STATE_PLAYING || state.state == PlaybackState.STATE_BUFFERING
         if (!playing && state.state != PlaybackState.STATE_PAUSED) return null
+
+        val now = SystemClock.elapsedRealtime()
+        if (playing) {
+            pausedSince.remove(controller.packageName)
+        } else {
+            val since = pausedSince.getOrPut(controller.packageName) {
+                state.lastPositionUpdateTime.takeIf { it in 1..now } ?: now
+            }
+            if (now - since > PAUSE_GRACE_MS) return null
+        }
 
         val title = metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE)
             ?: metadata.getString(MediaMetadata.METADATA_KEY_TITLE)
